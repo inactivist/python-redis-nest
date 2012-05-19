@@ -87,7 +87,7 @@ if __name__ == "__main__" :
     x[3]['attendees'].sadd('Albert')
     x[3]['attendees'].sadd('Robert')
     x[3]['attendees'].smembers()
-    print set(['Robert', 'Albert'])
+    print x[3]['attendees'].smembers()
 
     n = Nest("test")
     n.set(12345)

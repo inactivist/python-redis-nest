@@ -5,7 +5,11 @@ Nested, or "Object Oriented" keys for [Redis](http://redis.io).  Inspired by [Ru
 
 **Please visit the [project wiki](https://github.com/inactivist/python-redis-nest/wiki) pages for more information.**
 
-Status:
+License
+-------
+MIT License.  See the LICENSE file for details.
+
+Status
 ------
 * Tested with Python 2.7 and redis 2.4.9.
 * redis-nest is currently in an early alpha release.  There's more work to be done, but I anticipate no changes to the basic model.
