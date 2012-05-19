@@ -38,6 +38,12 @@ You can use `redis-nest` to operate on keys in a more natural and consistent way
     >>> x[3]['attendees'].smembers()
     set(['Robert', 'Albert'])
     
+Just for fun, here's the redis-cli MONITOR output for the above snippet:
+
+    1337441916.748159 "SADD" "event:3:attendees" "Albert"
+    1337441916.748857 "SADD" "event:3:attendees" "Robert"
+    1337441916.749591 "SMEMBERS" "event:3:attendees"
+
 Usage
 -----
 
