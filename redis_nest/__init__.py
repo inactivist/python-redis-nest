@@ -10,7 +10,9 @@ import inspect
 import types
 import pprint
 
-METHODS = ['append', 'blpop', 'brpop', 'brpoplpush', 'decr', 'decrby',
+#
+# _METHODS is a list of Redis methods we wish to proxy.
+_METHODS = ['append', 'blpop', 'brpop', 'brpoplpush', 'decr', 'decrby',
         'del', 'exists', 'expire', 'expireat', 'get', 'getbit', 'getrange', 'getset',
         'hdel', 'hexists', 'hget', 'hgetall', 'hincrby', 'hkeys', 'hlen', 'hmget',
         'hmset', 'hset', 'hsetnx', 'hvals', 'incr', 'incrby', 'lindex', 'linsert',
@@ -26,9 +28,11 @@ METHODS = ['append', 'blpop', 'brpop', 'brpoplpush', 'decr', 'decrby',
 
 # Get a list of Redis methods that take 'name' as the first parameter.
 # Is this method efficient?
-_methodList = [v for n, v in inspect.getmembers(Redis, inspect.ismethod)
-               if v.__name__ in METHODS]
+_method_list = [v for n, v in inspect.getmembers(Redis, inspect.ismethod)
+               if v.__name__ in _METHODS]
 
+# Previous list comprehension filters.  Trying to guess at candidate
+# Redis methods to be proxied without using _METHODS lookup.
 ##    if isinstance(v,types.MethodType)
 ##    and not v.__name__.startswith('__')
 ##    and len(inspect.getargspec(v)[0]) > 1
@@ -41,6 +45,7 @@ def _redis_func_wrapper(self, f):
        of function args list.
     """
     def wrapped_f(*args, **kwargs):
+        # We assume that kwargs are never used.  
         assert(len(kwargs) == 0)
         l = list(args)
         l.insert(0, str(self))  # 'name'
@@ -69,7 +74,7 @@ class Nest(str):
         # 
         # TODO: Is there a way to do this once for the class rather than
         # per-instance?  (Performance optimization.)
-        for m in _methodList:
+        for m in _method_list:
             setattr(self, m.__name__, _redis_func_wrapper(self, m))
 
     def __getitem__(self, index):
@@ -77,6 +82,13 @@ class Nest(str):
 
     
 if __name__ == "__main__" :
+    # Simple examples.  Need unit tests.  Get to it!
+    x=Nest('event')
+    x[3]['attendees'].sadd('Albert')
+    x[3]['attendees'].sadd('Robert')
+    x[3]['attendees'].smembers()
+    print set(['Robert', 'Albert'])
+
     n = Nest("test")
     n.set(12345)
     n.expire(60)
