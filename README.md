@@ -1,7 +1,9 @@
-Redis "Nested" Keys for Python (redis-nest)
+"Nested" Redis keys for Python (redis-nest)
 ======
 
 Nested, or "Object Oriented" keys for [Redis](http://redis.io).  Inspired by [Ruby Nest](https://github.com/soveran/nest). 
+
+**Please visit the [project wiki](https://github.com/inactivist/python-redis-nest/wiki) pages for more information.**
 
 Status:
 ------
@@ -13,10 +15,7 @@ Description
 
 *(Much of this section is based on the Ruby Nest [README](https://github.com/soveran/nest/blob/master/README.md) file.)*
 
-redis-nest is a simple wrapper around the Python's [redis](http://pypi.python.org/pypi/redis) package.
-
-It allows you to create and operate on namespaced keys when using Redis.
-
+*`redis-nest`* is a simple wrapper around the Python's [redis](http://pypi.python.org/pypi/redis) package.  It allows you to create and operate on *namespaced* keys when using Redis.
 
 For example, if you are operating on Redis keys like these:
 
@@ -29,7 +28,7 @@ For example, if you are operating on Redis keys like these:
     >>> r.smembers("event:3:attendees")
     set(['Robert', 'Albert'])
 
-You can use redis-nest to operate on the keys in a more natural way:
+You can use `redis-nest` to operate on keys in a more natural and consistent way:
 
     >>> x=Nest('event')
     >>> x[3]['attendees'].sadd('Albert')
