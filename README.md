@@ -1,9 +1,12 @@
 Redis "Nested" Keys for Python (redis-nest)
 ======
 
-Nested, or "Object Oriented" keys for [Redis](http://redis.io).
+Nested, or "Object Oriented" keys for [Redis](http://redis.io).  Inspired by [Ruby Nest](https://github.com/soveran/nest). 
 
-Inspired by [Ruby Nest](https://github.com/soveran/nest). 
+Status:
+------
+* Tested with Python 2.7 and redis 2.4.9.
+* redis-nest is currently in an early alpha release.  There's more work to be done, but the basic model is not expected to change.
 
 Description
 -----------
