@@ -1,6 +1,6 @@
 """
 Python port of Ruby Nest library (https://github.com/soveran/nest)
-Copyright (c) 2012, Agora Games, LLC All rights reserved.
+Copyright (c) 2012, Exodus Development, Inc.  All Rights Reserved.
 https://github.com/inactivist/python-redis-nest/blob/master/LICENSE.txt
 """
 __version__ = "0.0.1"
