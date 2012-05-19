@@ -8,11 +8,12 @@ Inspired by [Ruby Nest](https://github.com/soveran/nest).
 Description
 -----------
 
+*(Much of this section is based on the Ruby Nest [README](https://github.com/soveran/nest/blob/master/README.md) file.)*
+
 redis-nest is a simple wrapper around the Python's [redis](http://pypi.python.org/pypi/redis) package.
 
 It allows you to create and operate on namespaced keys when using Redis.
 
-Most of what follows is based on the Ruby Nest [README](https://github.com/soveran/nest/blob/master/README.md) file.
 
 For example, if you are operating on Redis keys like these:
 
@@ -38,7 +39,7 @@ You can use redis-nest to operate on the keys in a more natural way:
 Usage
 -----
 
-Redis Nest is modeled after the Ruby Nest library, and it's easy to 
+Redis Nest is modeled after the [Ruby Nest](https://github.com/soveran/nest) library, and it's easy to 
 use.  You create a 'namespace' which is used as the base Redis key,
 then you can add subkeys under that namespace, which are represented
 as a concatenation of colon-separated subkeys based on the array path.
