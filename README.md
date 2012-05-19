@@ -8,7 +8,7 @@ Nested, or "Object Oriented" keys for [Redis](http://redis.io).  Inspired by [Ru
 Status:
 ------
 * Tested with Python 2.7 and redis 2.4.9.
-* redis-nest is currently in an early alpha release.  There's more work to be done, but the basic model is not expected to change.
+* redis-nest is currently in an early alpha release.  There's more work to be done, but I anticipate no changes to the basic model.
 
 Description
 -----------
