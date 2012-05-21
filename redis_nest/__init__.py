@@ -102,8 +102,6 @@ class Nest(str):
             if m:
                 #print '%s(%d): Adding AS-IS method "%s": %s' % (self, id(self), name, m)
                 setattr(self, name, types.MethodType(m, self.redis, self.redis.__class__))
-        
-        #     
         return super(Nest, self).__getattribute__(name)
 
     def __getslice__(self, i, j):
@@ -120,8 +118,7 @@ class Nest(str):
         return Nest("%s:%s" % (self, index))
 
     #
-    # Define redis methods that don't take 'name' as first parameter.
-    
+    # Define redis methods aren't automatically handled in __getattr__().
     def delete(self):
         """Simple delete.  Forward to redis instance with self as string."""
         return self.redis.delete(str(self))

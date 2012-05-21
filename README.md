@@ -102,10 +102,12 @@ You can specify your own Redis library instance:
     >>> r = redis.Redis(host="192.168.0.101") 
     >>> x = redis_nest.Nest("foo", redis=r)
  
-Installation
+Installation and Requirements
 ------------
 
 Requires the [redis](https://github.com/inactivist/python-redis-nest/blob/master/README.md) python library.
+
+Requires Python 2.6 or higher.  Python 3 is not supported at this time.
 
 For now, just checkout the repo and add it to your PYTHONPATH.  
 A PyPi installable package is forthcoming.
