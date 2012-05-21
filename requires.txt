@@ -1,2 +1,3 @@
+# Requires redis-py, which is known simply as 'redis'
 redis
 
