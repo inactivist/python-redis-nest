@@ -94,6 +94,8 @@ representation is a valid Redis key string:
     >>> ns["bar"][42]
     "foo:bar:42"
 
+**NOTE:** Slices and Ellipsis list notation are not supported and will result in an exception. 
+
 You can specify your own Redis library instance:
 
     import redis

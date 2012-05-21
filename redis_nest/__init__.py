@@ -3,7 +3,7 @@ Python port of Ruby Nest library (https://github.com/soveran/nest)
 Copyright (c) 2012, Exodus Development, Inc.  All Rights Reserved.
 https://github.com/inactivist/python-redis-nest/blob/master/LICENSE.txt
 """
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 from redis import Redis
 import inspect
@@ -11,25 +11,37 @@ import types
 import pprint
 
 #
-# _METHODS is a list of Redis methods we wish to proxy.
-_METHODS = ['append', 'blpop', 'brpop', 'brpoplpush', 'decr', 'decrby',
-        'del', 'exists', 'expire', 'expireat', 'get', 'getbit', 'getrange', 'getset',
+# _METHODS is a list of Redis public methods we wish to proxy by inserting key value as
+# first parameter.
+_METHODS_ADD_SELF = ['append', 'brpoplpush', 'decr', 'decrby', 'exists',
+        'expire', 'expireat', 'get', 'getbit', 'getrange', 'getset',
         'hdel', 'hexists', 'hget', 'hgetall', 'hincrby', 'hkeys', 'hlen', 'hmget',
         'hmset', 'hset', 'hsetnx', 'hvals', 'incr', 'incrby', 'lindex', 'linsert',
         'llen', 'lpop', 'lpush', 'lpushx', 'lrange', 'lrem', 'lset', 'ltrim', 'move',
-        'persist', 'publish', 'rename', 'renamenx', 'rpop', 'rpoplpush', 'rpush',
-        'rpushx', 'sadd', 'scard', 'sdiff', 'sdiffstore', 'set', 'setbit', 'setex',
-        'setnx', 'setrange', 'sinter', 'sinterstore', 'sismember', 'smembers',
-        'smove', 'sort', 'spop', 'srandmember', 'srem', 'strlen', 'subscribe',
-        'sunion', 'sunionstore', 'ttl', 'type', 'unsubscribe', 'watch', 'zadd',
-        'zcard', 'zcount', 'zincrby', 'zinterstore', 'zrange', 'zrangebyscore',
+        'persist', 'rename', 'renamenx', 'rpop', 'rpoplpush', 'rpush',
+        'rpushx', 'sadd', 'scard', 'sdiffstore', 'set', 'setbit', 'setex',
+        'setnx', 'setrange', 'sismember', 'smembers',
+        'smove', 'sort', 'spop', 'srandmember', 'srem', 'strlen', 
+        'ttl', 'type', 'zadd',
+        'zcard', 'zcount', 'zincrby', 'zrange', 'zrangebyscore',
         'zrank', 'zrem', 'zremrangebyrank', 'zremrangebyscore', 'zrevrange',
-        'zrevrangebyscore', 'zrevrank', 'zscore', 'zunionstore']
+        'zrevrangebyscore', 'zrevrank', 'zscore']
 
+# List of methods that need to be proxied without adding key name as first parameter.
+_METHODS_AS_IS = [
+    'blpop', 'brpop', 'keys', 'mget', 'mset', 'msetnx', 'publish', 'psubscribe', 
+    'punsubscribe',
+    'randomkey', 'sdiff', 
+    'sinter', 'sinterstore', 'subscribe', 'sunion', 'sunionstore', 'unsubscribe', 
+    'watch', 'zinterstore', 'zunionstore'
+    ]
 # Get a list of Redis methods that take 'name' as the first parameter.
 # Is this method efficient?
-_method_list = [v for n, v in inspect.getmembers(Redis, inspect.ismethod)
-               if v.__name__ in _METHODS]
+_method_list_self = [v for n, v in inspect.getmembers(Redis, inspect.ismethod)
+    if v.__name__ in _METHODS_ADD_SELF]
+
+_method_list_as_is = [v for n, v in inspect.getmembers(Redis, inspect.ismethod)
+    if v.__name__ in _METHODS_AS_IS]    
 
 # Previous list comprehension filters.  Trying to guess at candidate
 # Redis methods to be proxied without using _METHODS lookup.
@@ -69,18 +81,42 @@ class Nest(str):
         self.redis = kwargs.pop('redis', None)
         if self.redis is None:
             self.redis = Redis()
-        # Generate function wrappers/forwarders for all
+            
+        # Monkeypatch function wrappers/forwarders for all
         # target redis methods.
         # 
         # TODO: Is there a way to do this once for the class rather than
         # per-instance?  (Performance optimization.)
-        for m in _method_list:
+        
+        # Methods that take this item's key name as first parameter.
+        for m in _method_list_self:
             setattr(self, m.__name__, _redis_func_wrapper(self, m))
+        #
+        # Add 'as-is' instance methods to this instance.
+        for m in _method_list_as_is:
+            setattr(self, m.__name__, types.MethodType(m, self.redis, self.redis.__class__))
 
+    def __getslice__(self, i, j):
+        """Slices are not supported at this time."""
+        raise TypeError("Nest indices must be integers, not slices.")
+    
+    def __setslice__(self, i, j, sequence):
+        """Slices are not supported at this time."""
+        raise TypeError("Nest indices must be integers, not slices.")
+    
     def __getitem__(self, index):
+        if index is Ellipsis:
+            raise TypeError("Nest indices must be integers, not ellipsis.")
         return Nest("%s:%s" % (self, index))
 
+    #
+    # Define redis methods that don't take 'name' as first parameter.
     
+    def delete(self):
+        """Simple delete.  Forward to redis instance with self as string."""
+        return self.redis.delete(str(self))
+        
+        
 if __name__ == "__main__" :
     # Simple examples.  Need unit tests.  Get to it!
     x=Nest('event')
