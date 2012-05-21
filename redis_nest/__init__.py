@@ -87,8 +87,7 @@ class Nest(str):
         self.redis = kwargs.pop('redis', None)
         if self.redis is None:
             self.redis = Redis()
-            
-            
+
     def __getattr__(self, name):
         # Monkeypatch function wrappers/forwarders for target redis methods.
         # __getattr__ is only called when attribute isn't found elsewhere. 
@@ -97,12 +96,12 @@ class Nest(str):
         m = _redis_methods_add_self_and_name.get(name, None)
         if m:
             #print '%s(%d): Adding SELF,NAME method "%s": %s' % (self, id(self), name, m)
-            setattr(self, m.__name__, _redis_func_wrapper(self, m))
+            setattr(self, name, _redis_func_wrapper(self, m))
         else:
             m = _redis_methods_as_is.get(name, None)
             if m:
                 #print '%s(%d): Adding AS-IS method "%s": %s' % (self, id(self), name, m)
-                setattr(self, m.__name__, types.MethodType(m, self.redis, self.redis.__class__))
+                setattr(self, name, types.MethodType(m, self.redis, self.redis.__class__))
         
         #     
         return super(Nest, self).__getattribute__(name)
