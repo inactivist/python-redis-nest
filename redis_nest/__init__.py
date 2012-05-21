@@ -35,13 +35,19 @@ _METHODS_AS_IS = [
     'sinter', 'sinterstore', 'subscribe', 'sunion', 'sunionstore', 'unsubscribe', 
     'watch', 'zinterstore', 'zunionstore'
     ]
-# Get a list of Redis methods that take 'name' as the first parameter.
-# Is this method efficient?
-_method_list_self = [v for n, v in inspect.getmembers(Redis, inspect.ismethod)
-    if v.__name__ in _METHODS_ADD_SELF]
 
-_method_list_as_is = [v for n, v in inspect.getmembers(Redis, inspect.ismethod)
-    if v.__name__ in _METHODS_AS_IS]    
+# Generate method lookup dictionaries.  
+# TODO: Is there a more efficient way to search the method name lists?
+
+# Get a list of Redis methods that take 'name' as the first parameter.
+_redis_methods_add_self_and_name = dict((name, func) 
+    for name, func in inspect.getmembers(Redis, inspect.ismethod)
+        if name in _METHODS_ADD_SELF)
+
+# Get a list of Redis methods to be proxied as-is.
+_redis_methods_as_is = dict((name, func) 
+    for name, func in inspect.getmembers(Redis, inspect.ismethod)
+        if name in _METHODS_AS_IS)
 
 # Previous list comprehension filters.  Trying to guess at candidate
 # Redis methods to be proxied without using _METHODS lookup.
@@ -82,19 +88,24 @@ class Nest(str):
         if self.redis is None:
             self.redis = Redis()
             
-        # Monkeypatch function wrappers/forwarders for all
-        # target redis methods.
-        # 
-        # TODO: Is there a way to do this once for the class rather than
-        # per-instance?  (Performance optimization.)
-        
-        # Methods that take this item's key name as first parameter.
-        for m in _method_list_self:
+            
+    def __getattr__(self, name):
+        # Monkeypatch function wrappers/forwarders for target redis methods.
+        # __getattr__ is only called when attribute isn't found elsewhere. 
+
+        # Methods that take self and this item's key name as first parameter.
+        m = _redis_methods_add_self_and_name.get(name, None)
+        if m:
+            #print '%s(%d): Adding SELF,NAME method "%s": %s' % (self, id(self), name, m)
             setattr(self, m.__name__, _redis_func_wrapper(self, m))
-        #
-        # Add 'as-is' instance methods to this instance.
-        for m in _method_list_as_is:
-            setattr(self, m.__name__, types.MethodType(m, self.redis, self.redis.__class__))
+        else:
+            m = _redis_methods_as_is.get(name, None)
+            if m:
+                #print '%s(%d): Adding AS-IS method "%s": %s' % (self, id(self), name, m)
+                setattr(self, m.__name__, types.MethodType(m, self.redis, self.redis.__class__))
+        
+        #     
+        return super(Nest, self).__getattribute__(name)
 
     def __getslice__(self, i, j):
         """Slices are not supported at this time."""
