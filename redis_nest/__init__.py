@@ -93,12 +93,12 @@ class Nest(str):
         # __getattr__ is only called when attribute isn't found elsewhere. 
 
         # Methods that take self and this item's key name as first parameter.
-        m = _redis_methods_add_self_and_name.get(name, None)
+        m = _redis_methods_add_self_and_name.get(name)
         if m:
             #print '%s(%d): Adding SELF,NAME method "%s": %s' % (self, id(self), name, m)
             setattr(self, name, _redis_func_wrapper(self, m))
         else:
-            m = _redis_methods_as_is.get(name, None)
+            m = _redis_methods_as_is.get(name)
             if m:
                 #print '%s(%d): Adding AS-IS method "%s": %s' % (self, id(self), name, m)
                 setattr(self, name, types.MethodType(m, self.redis, self.redis.__class__))
